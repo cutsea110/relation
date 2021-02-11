@@ -88,4 +88,79 @@ FROM student_skill ss
 JOIN take_lecture tl1 ON ss.student = tl1.student
 ;
 
+--------------------------------------------------
+CREATE TABLE account (
+  name         VARCHAR(20) NOT NULL,
+  age          INTEGER     NOT NULL,
+  sex          CHAR(1)     NOT NULL,
+
+  PRIMARY KEY(name)
+);
+
+CREATE TABLE social_network (
+  follower     VARCHAR(20) NOT NULL,
+  followee     VARCHAR(20) NOT NULL,
+
+  FOREIGN KEY (follower) REFERENCES account (name),
+  FOREIGN KEY (followee) REFERENCES account (name),
+  PRIMARY KEY (follower, followee)
+);
+
+INSERT INTO account
+  (name, age, sex)
+VALUES ('音無',   27, '女'),
+       ('一の瀬', 50, '女'),
+       ('二階堂', 22, '男'),
+       ('三鷹',   32, '男'),
+       ('四谷',   43, '男'),
+       ('五代',   25, '男'),
+       ('六本木', 29, '女'),
+       ('七尾',   25, '女'),
+       ('八神',   17, '女'),
+       ('九条',   24, '女');
+
+INSERT INTO social_network
+   (follower, followee)
+VALUES ('音無',   '一の瀬'),
+       ('音無',   '三鷹'),
+       ('音無',   '四谷'),
+       ('音無',   '五代'),
+       ('音無',   '六本木'),
+       ('音無',   '七尾'),
+       ('音無',   '八神'),
+       ('一の瀬', '音無'),
+       ('二階堂', '五代'),
+       ('三鷹',   '音無'),
+       ('三鷹',   '五代'),
+       ('四谷',   '五代'),
+       ('五代',   '音無'),
+       ('五代',   '三鷹'),
+       ('五代',   '四谷'),
+       ('五代',   '七尾'),
+       ('六本木', '音無'),
+       ('六本木', '五代'),
+       ('七尾',   '五代'),
+       ('八神',   '五代'),
+       ('八神',   '音無'),
+       ('九条',   '音無'),
+       ('九条',   '三鷹');
+
+-- R . (S /\ T) \subseteq R . S /\ R . T
+-- R . (S /\ T)
+SELECT distinct sn.followee              -- R
+  FROM social_network sn
+  JOIN account a ON a.name = sn.follower -- R
+ WHERE a.age <= 25 AND a.sex = '女'; -- S /\ T
+
+-- R . S /\ R . T
+SELECT distinct sn.followee              -- R
+  FROM social_network sn
+  JOIN account a ON a.name = sn.follower -- R
+ WHERE a.age <= 25    -- S
+INTERSECT
+SELECT distinct sn.followee              -- R
+  FROM social_network sn
+  JOIN account a ON a.name = sn.follower -- R
+ WHERE a.sex = '女';  -- T
+
 EOSQL

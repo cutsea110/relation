@@ -69,6 +69,23 @@ WHERE NOT EXISTS (
     SELECT lecture
     FROM take_lecture tl2
     WHERE tl1.student = tl2.student
-);
+)
+;
+
+-- スキル獲得までに必要な履修
+WITH student_skill AS (
+    SELECT DISTINCT student, skill
+    FROM take_lecture, skill_lecture
+)
+SELECT ss.student, ss.skill, sl.lecture
+FROM student_skill ss
+JOIN skill_lecture sl ON ss.skill = sl.skill
+
+EXCEPT
+
+SELECT ss.student, ss.skill, tl1.lecture
+FROM student_skill ss
+JOIN take_lecture tl1 ON ss.student = tl1.student
+;
 
 EOSQL

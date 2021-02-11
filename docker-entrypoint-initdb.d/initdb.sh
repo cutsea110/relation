@@ -163,4 +163,42 @@ SELECT distinct sn.followee              -- R
   JOIN account a ON a.name = sn.follower -- R
  WHERE a.sex = '女';  -- T
 
+-- モジュラ則
+-- R . S /\ T \subseteq R . (S /\ R^op . T)
+--
+-- R . S /\ T
+SELECT a.name, sn.followee               -- R
+  FROM social_network sn
+  JOIN account a ON a.name = sn.follower
+ WHERE a.age <= 25 AND a.sex = '女'      -- S
+INTERSECT
+SELECT sn.follower, sn.followee          -- T
+  FROM social_network sn
+  JOIN account a1 ON a1.name = sn.follower
+  JOIN account a2 ON a2.name = sn.followee
+ WHERE a1.sex <> a2.sex                  -- T
+;
+
+-- R . (S /\ R^op . T)
+WITH t AS (
+    SELECT sn.follower, sn.followee          -- T
+      FROM social_network sn
+      JOIN account a1 ON a1.name = sn.follower
+      JOIN account a2 ON a2.name = sn.followee
+     WHERE a1.sex <> a2.sex                  -- T
+),
+sub AS (
+    SELECT name                              -- S
+      FROM account
+     WHERE age <= 25 AND sex = '女'          -- S
+    INTERSECT
+    SELECT sn.follower AS name               -- R^op
+      FROM social_network sn
+      JOIN t ON t.followee = sn.followee     -- T
+)
+SELECT sn.follower, sn.followee
+  FROM social_network sn
+  JOIN sub ON sub.name = sn.follower
+;
+
 EOSQL

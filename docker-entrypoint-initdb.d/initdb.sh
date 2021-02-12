@@ -225,7 +225,7 @@ CREATE TABLE supporter_party (
 
 --------------------------------------------------
 CREATE TABLE coop_order (
-  id           SERIAL        NOT NULL,
+  id           BIGINT        NOT NULL,
   ordered_at   DATE          NOT NULL,
 
   PRIMARY KEY (id)
@@ -246,5 +246,85 @@ CREATE TABLE stock_item (
   FOREIGN KEY (order_id) REFERENCES coop_order (id)
 );
 
+INSERT INTO coop_order
+  (id, ordered_at)
+VALUES (101, '2021-01-06'),
+       (102, '2021-01-13'),
+       (103, '2021-01-20'),
+       (104, '2021-01-27'),
+       (105, '2021-02-03');
+
+INSERT INTO order_item
+   (order_id, item, price)
+VALUES (101, 'ラーメン', 500),
+       (101, 'ビビンバセット', 400),
+       (101, 'ティッシュ', 350),
+       (101, '牛乳', 1200),
+       (101, 'たまご', 200),
+       (102, '冷凍うどん', 500),
+       (102, '牛乳', 1200),
+       (102, 'たまご', 200),
+       (102, '冷凍おにぎり', 390),
+       (103, '牛乳', 1200),
+       (103, 'たまご', 200),
+       (103, 'ブロッコリー', 400),
+       (103, '冷凍唐揚げ', 460),
+       (103, '冷凍うどん', 500),
+       (104, '牛乳', 1200),
+       (104, 'たまご', 200),
+       (104, '牛角キムチ', 410),
+       (104, 'ビビンバセット', 400),
+       (104, 'トイレットペーパー', 470),
+       (104, '冷凍おにぎり', 390),
+       (105, '牛乳', 1200),
+       (105, 'たまご', 200),
+       (105, 'ブロッコリー', 400),
+       (105, 'ビビンバセット', 400);
+
+INSERT INTO stock_item
+  (order_id, item)
+VALUES (101, 'ティッシュ'),
+       (102, '冷凍うどん'),
+       (103, '冷凍唐揚げ'),
+       (104, 'トイレットペーパー'),
+       (104, '牛角キムチ'),
+       (105, '牛乳'),
+       (105, 'たまご'),
+       (105, 'ブロッコリー');
+
+-- モジュラ則
+-- R . S /\ T \subseteq R . (S /\ R^op . T)
+-- R . S /\ T
+SELECT co.id, oi.item
+  FROM coop_order co
+  JOIN order_item oi ON co.id = oi.order_id  -- R
+ WHERE (
+        date_part('year', co.ordered_at),
+        date_part('month', co.ordered_at),
+        date_part('day', co.ordered_at)
+       ) IN ((2021, 1, 6), (2021, 1, 13))    -- S
+INTERSECT
+SELECT si.order_id AS id, si.item            -- T
+  FROM stock_item si
+;
+
+-- R . (S /\ R^op . T)
+WITH sub AS (
+    SELECT co.id
+      FROM coop_order co
+     WHERE (
+            date_part('year', co.ordered_at),
+            date_part('month', co.ordered_at),
+            date_part('day', co.ordered_at)
+           ) IN ((2021, 1, 6), (2021, 1, 13))    -- S
+    INTERSECT
+    SELECT oi.order_id AS id                                                 -- R^op . T
+      FROM stock_item si
+      JOIN order_item oi ON si.order_id = oi.order_id AND si.item = oi.item  -- R^op . T
+)
+SELECT sub.id, oi.item
+FROM sub
+JOIN order_item oi ON sub.id = oi.order_id -- R
+;
 
 EOSQL

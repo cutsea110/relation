@@ -165,22 +165,31 @@ SELECT distinct sn.followee              -- R
 
 -- (R /\ S) . T \subseteq R . T /\ S . T
 -- (R /\ S) . T
-SELECT DISTINCT sn.followee
-  FROM social_network sn                 -- T
-  JOIN account a ON a.name = sn.follower
- WHERE a.age <= 25 AND a.sex = '女'      -- R /\ S
+SELECT sn1.follower, sn2.followee
+FROM social_network sn1                                 -- T
+JOIN social_network sn2 ON sn1.followee = sn2.follower  -- R /\ S
+JOIN account a1 ON a1.name = sn1.follower
+JOIN account a2 ON a2.name = sn2.follower
+JOIN account a3 ON a3.name = sn2.followee
+WHERE a2.age > a3.age AND a2.sex <> a3.sex              -- R /\ S
 ;
 
 -- R . T /\ S . T
-SELECT sn.followee
-  FROM social_network sn                  -- T
-  JOIN account a ON a.name = sn.follower
- WHERE a.age <= 25                        -- R
+SELECT sn1.follower, sn2.followee
+FROM social_network sn1                                 -- T
+JOIN social_network sn2 ON sn1.followee = sn2.follower  -- R
+JOIN account a1 ON a1.name = sn1.follower
+JOIN account a2 ON a2.name = sn2.follower
+JOIN account a3 ON a3.name = sn2.followee
+WHERE a2.age > a3.age                                   -- R
 INTERSECT
-SELECT sn.followee
-  FROM social_network sn                  -- T
-  JOIN account a ON a.name = sn.follower
- WHERE a.sex = '女'                       -- S
+SELECT sn1.follower, sn2.followee
+FROM social_network sn1                                 -- T
+JOIN social_network sn2 ON sn1.followee = sn2.follower  -- S
+JOIN account a1 ON a1.name = sn1.follower
+JOIN account a2 ON a2.name = sn2.follower
+JOIN account a3 ON a3.name = sn2.followee
+WHERE a2.sex <> a3.sex                                  -- S
 ;
 
 

@@ -223,11 +223,11 @@ SELECT sn.follower, sn.followee
 ;
 
 --------------------------------------------------
-CREATE TABLE party_member (
-  party        VARCHAR(20)   NOT NULL,
+CREATE TABLE team_member (
+  team         VARCHAR(20)   NOT NULL,
   member       VARCHAR(20)   NOT NULL,
 
-  PRIMARY KEY(party, member)
+  PRIMARY KEY(team, member)
 );
 
 CREATE TABLE supporter_member (
@@ -237,11 +237,11 @@ CREATE TABLE supporter_member (
   PRIMARY KEY(supporter, member)
 );
 
-CREATE TABLE supporter_party (
+CREATE TABLE supporter_team (
   supporter    VARCHAR(20)   NOT NULL,
-  party        VARCHAR(20)   NOT NULL,
+  team         VARCHAR(20)   NOT NULL,
 
-  PRIMARY KEY(supporter, party)
+  PRIMARY KEY(supporter, team)
 );
 
 --------------------------------------------------

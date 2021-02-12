@@ -201,4 +201,50 @@ SELECT sn.follower, sn.followee
   JOIN sub ON sub.name = sn.follower
 ;
 
+--------------------------------------------------
+CREATE TABLE party_member (
+  party        VARCHAR(20)   NOT NULL,
+  member       VARCHAR(20)   NOT NULL,
+
+  PRIMARY KEY(party, member)
+);
+
+CREATE TABLE supporter_member (
+  supporter    VARCHAR(20)   NOT NULL,
+  member       VARCHAR(20)   NOT NULL,
+
+  PRIMARY KEY(supporter, member)
+);
+
+CREATE TABLE supporter_party (
+  supporter    VARCHAR(20)   NOT NULL,
+  party        VARCHAR(20)   NOT NULL,
+
+  PRIMARY KEY(supporter, party)
+);
+
+--------------------------------------------------
+CREATE TABLE coop_order (
+  id           SERIAL        NOT NULL,
+  ordered_at   DATE          NOT NULL,
+
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE order_item (
+  order_id     BIGINT        NOT NULL,
+  item         VARCHAR(20)   NOT NULL,
+  price        INTEGER       NOT NULL,
+  
+  FOREIGN KEY (order_id) REFERENCES coop_order (id)
+);
+
+CREATE TABLE stock_item (
+  order_id     BIGINT        NOT NULL,
+  item         VARCHAR(20)   NOT NULL,
+
+  FOREIGN KEY (order_id) REFERENCES coop_order (id)
+);
+
+
 EOSQL

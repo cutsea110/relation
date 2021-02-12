@@ -163,6 +163,27 @@ SELECT distinct sn.followee              -- R
   JOIN account a ON a.name = sn.follower -- R
  WHERE a.sex = '女';  -- T
 
+-- (R /\ S) . T \subseteq R . T /\ S . T
+-- (R /\ S) . T
+SELECT DISTINCT sn.followee
+  FROM social_network sn                 -- T
+  JOIN account a ON a.name = sn.follower
+ WHERE a.age <= 25 AND a.sex = '女'      -- R /\ S
+;
+
+-- R . T /\ S . T
+SELECT sn.followee
+  FROM social_network sn                  -- T
+  JOIN account a ON a.name = sn.follower
+ WHERE a.age <= 25                        -- R
+INTERSECT
+SELECT sn.followee
+  FROM social_network sn                  -- T
+  JOIN account a ON a.name = sn.follower
+ WHERE a.sex = '女'                       -- S
+;
+
+
 -- モジュラ則
 -- R . S /\ T \subseteq R . (S /\ R^op . T)
 --
